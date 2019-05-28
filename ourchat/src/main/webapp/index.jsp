@@ -12,6 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>Our chat!</h1>
+        Chat freely with your friends and family. Its ours and its free.
     </body>
 </html>
