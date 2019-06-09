@@ -1,2 +1,16 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/ourchat"/>-->
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/ourchat"/>
+<Context antiJARLocking="true" path="">
+    <Resource name="jdbc/mariaDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              validationQuery="SELECT 1"
+              maxTotal="100"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="korisnik_baze"
+              password="jakoristimbazu"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://116.203.180.75/ourchat?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8" />
+</Context>

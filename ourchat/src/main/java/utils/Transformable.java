@@ -17,11 +17,11 @@ public interface Transformable {
      *
      * @return
      */
-    public default String stringify() {
+    default String stringify() {
         return TransformUtils.toString(this);
     }
 
-    public default JSONObject jsonfy() {
-        return TransformUtils.toJson(this);
+    default JSONObject jsonfy() {
+        return TransformUtils.objectToJson(this);
     }
 }

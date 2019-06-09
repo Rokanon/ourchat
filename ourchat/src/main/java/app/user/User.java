@@ -1,10 +1,16 @@
 package app.user;
 
 import app.base.Model;
+import app.dao.annotations.Column;
+import app.dao.annotations.Table;
+import app.dao.enums.FieldType;
 
+@Table(name = "user")
 public class User extends Model {
 
+    @Column(name = "mail", type = FieldType.STRING)
     private String email;
+    @Column(name = "password", type = FieldType.STRING)
     private String password;
 
     /**

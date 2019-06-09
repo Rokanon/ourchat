@@ -14,7 +14,7 @@ import app.base.Model;
 public class Profile extends Model {
     
     private Long userId;
-    private String username;
+    private String name;
 
     /**
      * @return the userId
@@ -31,17 +31,17 @@ public class Profile extends Model {
     }
 
     /**
-     * @return the username
+     * @return the name
      */
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
     /**
-     * @param username the username to set
+     * @param name the name to set
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
     
 }

@@ -5,7 +5,10 @@
  */
 package app.base;
 
+import app.dao.annotations.Column;
+import app.dao.enums.FieldType;
 import java.io.Serializable;
+import org.json.JSONObject;
 import utils.Transformable;
 
 /**
@@ -15,11 +18,16 @@ import utils.Transformable;
  */
 public class Model implements Serializable, Transformable {
 
+    @Column(name = "id", type = FieldType.LONG)
     private Long id;
 
     @Override
     public String toString() {
         return stringify();
+    }
+    
+    public JSONObject toJson() {
+        return jsonfy();
     }
 
     /**

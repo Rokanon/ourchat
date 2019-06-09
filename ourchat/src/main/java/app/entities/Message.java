@@ -6,6 +6,9 @@
 package app.entities;
 
 import app.base.Model;
+import app.dao.annotations.Column;
+import app.dao.annotations.Table;
+import app.dao.enums.FieldType;
 import java.util.Date;
 
 /**
@@ -13,11 +16,16 @@ import java.util.Date;
  *
  * @author dark
  */
+@Table(name = "message")
 public class Message extends Model {
 
+    @Column(name = "message", type = FieldType.STRING)
     private String message;
+    @Column(name = "seen", type = FieldType.BOOLEAN)
     private Boolean seen;
+    @Column(name = "create_date", type = FieldType.DATE)
     private Date createDate;
+    @Column(name = "update_date", type = FieldType.DATE)
     private Date updateDate;
 
     /**
