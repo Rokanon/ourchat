@@ -5,12 +5,13 @@
  */
 package test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import app.utils.ConnectionProperties;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,46 +23,19 @@ public class TestMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TestClass testClass = new TestClass();
 
-        testClass.setFieldBoolean(Boolean.FALSE);
-        testClass.setFieldDate(new Date());
-        testClass.setFieldInteger(23);
-        testClass.setFieldLong(10L);
-        testClass.setFieldString("Oktorar");
-        testClass.setFieldList(fillList());
-        testClass.setFieldMap(fillMap());
-
-//        System.out.println("TestClass:\n" + testClass.toString());
-        System.out.println("TestClass:\n" + testClass.toJson().toString(2));
-    }
-
-    public static List<TestClass2> fillList() {
-        List<TestClass2> list = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            TestClass2 testClass = new TestClass2();
-            testClass.setFieldBoolean2(Boolean.FALSE);
-            testClass.setFieldDate2(new Date());
-            testClass.setFieldInteger2(23 + i);
-            testClass.setFieldLong2(10L + i);
-            testClass.setFieldString2("Oktorar" + i);
-            list.add(testClass);
+        Connection connection = ConnectionProperties.getConnection();
+        Statement statement;
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("select table_name from information_schema.tables where table_schema='" + ConnectionProperties.DATABASE + "';");
+            while (rs.next()) {
+                System.out.println("table_name: " + rs.getString("table_name"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return list;
+        ConnectionProperties.closeConnection(connection);
+ 
     }
-
-    public static LinkedHashMap<String, TestClass2> fillMap() {
-        LinkedHashMap<String, TestClass2> map = new LinkedHashMap<>();
-        for (int i = 0; i < 3; i++) {
-            TestClass2 testClass = new TestClass2();
-            testClass.setFieldBoolean2(Boolean.TRUE);
-            testClass.setFieldDate2(new Date());
-            testClass.setFieldInteger2(23 + i);
-            testClass.setFieldLong2(10L + i);
-            testClass.setFieldString2("Oktorar" + i);
-            map.put("" + i, testClass);
-        }
-        return map;
-    }
-
 }
