@@ -26,7 +26,7 @@ public class ConnectionProperties {
 
     private static Connection connection;
 
-    public static Connection getConnection() {
+    public static Connection createConnection() {
         if (null == connection) {
             try {
                 connection = DriverManager.getConnection(connectionUri());
