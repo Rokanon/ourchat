@@ -1,4 +1,4 @@
-package app.dao.enums;
+package ourchat.ourchat.dao.enums;
 
 /* Define target DB field types to handle them in proper way */
 public enum FieldType {

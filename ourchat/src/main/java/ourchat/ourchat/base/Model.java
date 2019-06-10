@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.base;
+package ourchat.ourchat.base;
 
-import app.dao.annotations.Column;
-import app.dao.enums.FieldType;
+import ourchat.ourchat.dao.annotations.Column;
+import ourchat.ourchat.dao.enums.FieldType;
 import java.io.Serializable;
 import org.json.JSONObject;
-import utils.Transformable;
+import app.utils.Transformable;
 
 /**
  * Base superclass

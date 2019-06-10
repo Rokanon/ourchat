@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.user.dao;
+package ourchat.ourchat.user.dao;
 
-import app.dao.GenericDao;
-import app.user.User;
+import ourchat.ourchat.dao.GenericDao;
+import ourchat.ourchat.user.User;
 import java.sql.Connection;
 
 /**

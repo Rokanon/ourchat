@@ -1,17 +1,13 @@
-package app.dao.annotations;
+package ourchat.ourchat.dao.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import app.dao.enums.FieldType;
-
-@Target(value = {ElementType.FIELD})
+@Target(value = {ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Column {
+public @interface Table {
 
     String name();
-
-    FieldType type() default FieldType.UNKNOWN;
 }

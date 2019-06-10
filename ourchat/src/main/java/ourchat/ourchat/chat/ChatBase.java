@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.chat;
+package ourchat.ourchat.chat;
 
-import app.base.Model;
+import ourchat.ourchat.base.Model;
 
 /**
  * Chat base superclass

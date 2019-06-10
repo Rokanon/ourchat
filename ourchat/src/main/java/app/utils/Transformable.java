@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package utils;
+package app.utils;
 
 import org.json.JSONObject;
 
@@ -18,7 +18,8 @@ public interface Transformable {
      * @return
      */
     default String stringify() {
-        return TransformUtils.toString(this);
+//        return TransformUtils.toString(this);
+        return "";
     }
 
     default JSONObject jsonfy() {

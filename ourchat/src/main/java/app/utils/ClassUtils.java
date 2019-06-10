@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package utils;
+package app.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -171,6 +174,76 @@ public class ClassUtils {
             methodName = methodName.toLowerCase().charAt(0) + methodName.substring(1);
         }
         return methodName;
+    }
+
+    /**
+     *
+     * @param clazz
+     * @return List of all class get methods
+     */
+    public static HashSet<Method> classGetMethods(Class clazz) {
+        HashSet<Method> methodList = new HashSet<>();
+
+        if (clazz.equals(Object.class)) {
+            return methodList;
+        }
+        methodList.addAll(classGetMethods(clazz.getSuperclass()));
+
+        for (Method declaredMethod : clazz.getDeclaredMethods()) {
+            if (declaredMethod.getName().startsWith("get")) {
+                methodList.add(declaredMethod);
+            }
+        }
+
+        return methodList;
+    }
+
+    /**
+     *
+     * @param classMethods
+     * @return
+     */
+    public static LinkedHashMap<String, Method> methodLHMap(Set<Method> classMethods) {
+        LinkedHashMap<String, Method> classMethodsMap = new LinkedHashMap<>();
+        for (Method classMethod : classMethods) { // faster is imperative than functional
+            if (!classMethodsMap.containsKey(stripGet(classMethod.getName()))) {
+                classMethodsMap.put(stripGet(classMethod.getName()), classMethod);
+            }
+        }
+        return classMethodsMap;
+    }
+
+    /**
+     *
+     * @param clazz
+     * @return List of all fields
+     */
+    public static HashSet<Field> classFields(Class clazz) {
+        HashSet<Field> fieldList = new HashSet<>();
+
+        if (clazz.equals(Object.class)) {
+            return fieldList;
+        }
+        fieldList.addAll(classFields(clazz.getSuperclass()));
+        fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+
+        return fieldList;
+    }
+
+    /**
+     *
+     * @param classFields
+     * @return HashMap: keys as field names, values as fields
+     */
+    public static LinkedHashMap<String, Field> fieldLHMap(Set<Field> classFields) {
+        LinkedHashMap<String, Field> classFieldsMap = new LinkedHashMap<>();
+
+        for (Field classField : classFields) {
+            if (!classFieldsMap.containsKey(classField.getName())) {
+                classFieldsMap.put(classField.getName(), classField);
+            }
+        }
+        return classFieldsMap;
     }
 
 }

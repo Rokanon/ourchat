@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.entities;
+package ourchat.ourchat.entities;
 
-import app.base.Model;
+import ourchat.ourchat.base.Model;
 import java.util.Date;
 
 /**

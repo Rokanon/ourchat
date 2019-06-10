@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.entities;
+package ourchat.ourchat.entities;
 
-import app.base.Model;
-import app.dao.annotations.Column;
-import app.dao.annotations.Table;
-import app.dao.enums.FieldType;
+import ourchat.ourchat.base.Model;
+import ourchat.ourchat.dao.annotations.Column;
+import ourchat.ourchat.dao.annotations.Table;
+import ourchat.ourchat.dao.enums.FieldType;
 import java.util.Date;
 
 /**

@@ -1,9 +1,9 @@
-package app.user;
+package ourchat.ourchat.user;
 
-import app.base.Model;
-import app.dao.annotations.Column;
-import app.dao.annotations.Table;
-import app.dao.enums.FieldType;
+import ourchat.ourchat.base.Model;
+import ourchat.ourchat.dao.annotations.Column;
+import ourchat.ourchat.dao.annotations.Table;
+import ourchat.ourchat.dao.enums.FieldType;
 
 @Table(name = "user")
 public class User extends Model {

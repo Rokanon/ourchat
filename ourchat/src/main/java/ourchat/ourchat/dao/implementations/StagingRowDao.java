@@ -1,4 +1,4 @@
-package app.dao.implementations;
+package ourchat.ourchat.dao.implementations;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import app.dao.GenericDao;
+import ourchat.ourchat.dao.GenericDao;
 //import rs.netset.migration.model.StagingRow;
 
 public class StagingRowDao /* extends GenericDao<StagingRow> */ {

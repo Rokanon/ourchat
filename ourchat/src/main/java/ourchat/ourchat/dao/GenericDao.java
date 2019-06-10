@@ -1,4 +1,4 @@
-package app.dao;
+package ourchat.ourchat.dao;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import app.dao.annotations.Column;
-import app.dao.annotations.Table;
-import app.dao.enums.FieldType;
+import ourchat.ourchat.dao.annotations.Column;
+import ourchat.ourchat.dao.annotations.Table;
+import ourchat.ourchat.dao.enums.FieldType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
-import utils.ClassUtils;
-import utils.DateUtils;
+import app.utils.ClassUtils;
+import app.utils.DateUtils;
 
 public abstract class GenericDao<T extends Serializable> {
 

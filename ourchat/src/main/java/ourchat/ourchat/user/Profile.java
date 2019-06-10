@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.user;
+package ourchat.ourchat.user;
 
-import app.base.Model;
+import ourchat.ourchat.base.Model;
 
 /**
  *
