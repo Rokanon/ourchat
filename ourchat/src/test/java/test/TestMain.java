@@ -24,7 +24,7 @@ public class TestMain {
      */
     public static void main(String[] args) {
 
-        Connection connection = ConnectionProperties.getConnection();
+        Connection connection = ConnectionProperties.createConnection();
         Statement statement;
         try {
             statement = connection.createStatement();
