@@ -18,6 +18,10 @@ public class UserDao extends GenericDao<User> {
     public UserDao(Connection connection) {
         super(connection);
     }
+
+    public UserDao() {
+        super();
+    }
     
 //    private static UserDao instance;
 //    

@@ -21,7 +21,10 @@ import ourchat.ourchat.dao.enums.FieldType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import app.utils.ClassUtils;
+import app.utils.ConnectionProperties;
 import app.utils.DateUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class GenericDao<T extends Serializable> {
 
@@ -36,6 +39,10 @@ public abstract class GenericDao<T extends Serializable> {
     private Map<String, Field> fieldValueMappings = new HashMap<>();
 
     private Connection connection;
+
+    public GenericDao() {
+        this(ConnectionProperties.createConnection());
+    }
 
     public GenericDao(Connection connection) {
         this.connection = connection;
@@ -65,7 +72,20 @@ public abstract class GenericDao<T extends Serializable> {
     }
 
     private Field[] getFields() {
-        return dto.getClass().getDeclaredFields();
+        Class clazz = dto.getClass();
+        List<Field> fields = new ArrayList<>();
+        while (!clazz.equals(Object.class)) {
+            for (Field declaredField : clazz.getDeclaredFields()) {
+                fields.add(declaredField);
+            }
+            clazz = clazz.getSuperclass();
+        }
+        Field[] fieldsArray = new Field[fields.size()];
+        for (int i = 0; i < fields.size(); i++) {
+            fieldsArray[i] = fields.get(i);
+        }
+
+        return fieldsArray;
     }
 
     private void fillMappings() {
@@ -97,6 +117,9 @@ public abstract class GenericDao<T extends Serializable> {
                 return fromResultSet(resultSet);
             }
         } catch (SQLException exception) {
+
+        } finally {
+            closeConnection();
         }
         return null;
     }
@@ -176,9 +199,13 @@ public abstract class GenericDao<T extends Serializable> {
             return null;
         }
     }
-    
+
     private String surroundStringQuotes(String string) {
         return "'" + string + "'";
+    }
+
+    private void closeConnection() {
+        ConnectionProperties.closeConnection(connection);
     }
 
     @Override
