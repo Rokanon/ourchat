@@ -28,7 +28,7 @@ public class TestMain {
 
         Connection connection = ConnectionProperties.createConnection();
         
-        UserDao dao = new UserDao(connection);
+        UserDao dao = new UserDao();
 //        
         User user = dao.getById(1); // ne ubacuje u polja super klase
         

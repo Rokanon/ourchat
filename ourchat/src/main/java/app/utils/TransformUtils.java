@@ -42,7 +42,7 @@ public class TransformUtils {
         LinkedHashMap<String, Field> classFieldsMap = ClassUtils.fieldLHMap(ClassUtils.classFields(clazz));
         LinkedHashMap<String, Method> classMethodsMap = ClassUtils.methodLHMap(ClassUtils.classGetMethods(clazz));
 
-        returnObject.put(clazz.getSimpleName(), clazz.cast(object).hashCode());
+        returnObject.put("class", clazz.getName());
 
         for (Map.Entry<String, Field> entry : classFieldsMap.entrySet()) {
 

@@ -19,7 +19,7 @@ public class ConnectionProperties {
 
     public static final String HOST = "localhost";
     public static final String PORT = "3306";
-    public static final String DATABASE = "";
+    public static final String DATABASE = "ourchat";
     public static final String USER = "";
     public static final String PASSWORD = "";
     public static final String OTHER_PARAMS = "autoReconnect=true&useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
@@ -29,8 +29,9 @@ public class ConnectionProperties {
     public static Connection createConnection() {
         if (null == connection) {
             try {
+                Class.forName("com.mysql.jdbc.Driver"); 
                 connection = DriverManager.getConnection(connectionUri());
-            } catch (SQLException ex) {
+            } catch (SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(ConnectionProperties.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

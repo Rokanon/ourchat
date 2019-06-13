@@ -111,13 +111,12 @@ public abstract class GenericDao<T extends Serializable> {
 
     public T getById(long id) {
         try {
-            ResultSet resultSet = connection.createStatement()
-                    .executeQuery("SELECT * FROM " + tableName + " WHERE ID= " + id);
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + tableName + " WHERE ID= " + id);
             if (resultSet.next()) {
                 return fromResultSet(resultSet);
             }
-        } catch (SQLException exception) {
-
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericDao.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             closeConnection();
         }
@@ -151,9 +150,9 @@ public abstract class GenericDao<T extends Serializable> {
             case BOOLEAN:
                 return rs.getBoolean(entry.getKey());
             default:
-                break;
+                return null;
         }
-        return null;
+
     }
 
     public T insert(T dto) {
@@ -165,10 +164,14 @@ public abstract class GenericDao<T extends Serializable> {
 
             PreparedStatement ps = connection.prepareStatement(psSql.toString(), Statement.RETURN_GENERATED_KEYS);
             ps.executeUpdate();
-        } catch (SQLException exception) {
-            // TODO Auto-generated catch block
+
+            return dto;
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericDao.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } finally {
+            closeConnection();
         }
-        return dto;
     }
 
     private String makeValuesClause(T dto) {
@@ -178,9 +181,10 @@ public abstract class GenericDao<T extends Serializable> {
             Field field = fieldValueMappings.get(key);
             try {
                 values.add(toPreparedStatementValue(field.get(dto)));
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(GenericDao.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         });
         val.append(values.stream().collect(Collectors.joining(","))).append(")");
         return val.toString();
