@@ -5,10 +5,10 @@
  */
 package ourchat.ourchat.entities;
 
+import app.core.dao.annotations.Column;
+import app.core.dao.annotations.Table;
+import app.core.dao.enums.FieldType;
 import ourchat.ourchat.base.Model;
-import ourchat.ourchat.dao.annotations.Column;
-import ourchat.ourchat.dao.annotations.Table;
-import ourchat.ourchat.dao.enums.FieldType;
 import java.util.Date;
 
 /**

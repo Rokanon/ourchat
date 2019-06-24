@@ -5,7 +5,7 @@
  */
 package ourchat.ourchat.user.dao;
 
-import ourchat.ourchat.dao.GenericDao;
+import app.core.dao.GenericDao;
 import ourchat.ourchat.user.User;
 import java.sql.Connection;
 
@@ -16,21 +16,13 @@ import java.sql.Connection;
 public class UserDao extends GenericDao<User> {
 
     public UserDao(Connection connection) {
-        super(connection);
+        super();
     }
 
     public UserDao() {
         super();
     }
     
-//    private static UserDao instance;
-//    
-//    private static UserDao getInstance() {
-//        if (null == instance) {
-//            instance = new UserDao();
-//        }
-//        return instance;
-//    }
     
     @Override
     protected User newDto() {
