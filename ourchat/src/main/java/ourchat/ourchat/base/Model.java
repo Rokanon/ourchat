@@ -5,8 +5,8 @@
  */
 package ourchat.ourchat.base;
 
-import ourchat.ourchat.dao.annotations.Column;
-import ourchat.ourchat.dao.enums.FieldType;
+import app.core.dao.annotations.Column;
+import app.core.dao.enums.FieldType;
 import java.io.Serializable;
 import org.json.JSONObject;
 import app.utils.Transformable;

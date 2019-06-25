@@ -7,11 +7,6 @@ package test;
 
 import app.utils.ConnectionProperties;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ourchat.ourchat.user.User;
 import ourchat.ourchat.user.dao.UserDao;
 
