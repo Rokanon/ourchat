@@ -29,338 +29,350 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import app.core.utils.TimeMesure;
+import java.lang.reflect.InvocationTargetException;
+import ourchat.ourchat.base.Model;
 
 /**
  * Not fully implemented yet
  *
  * @param <Dto> generic type representing underlying database table TODO: handle
- *              multi-threading, performance improvements, {@code Logger}
- *              instead of {@code System::out} and etc...
+ * multi-threading, performance improvements, {@code Logger} instead of
+ * {@code System::out} and etc...
  */
 public abstract class GenericDao<Dto extends Serializable> {
 
-	private final Dto dto = newDto();
+    private final Dto dto = newDto();
 
-	protected abstract Dto newDto();
+    protected abstract Dto newDto();
 
-	private String tableName;
-	private String primaryKey;
-	private ConnectionType connectionType;
-	private String commaSeparatedColumns;
-	private final List<Field> fields = new ArrayList<>();
-	private final List<String> columns = new ArrayList<>();
-	private final Map<String, FieldType> columnMapping = new HashMap<>();
-	private final Map<String, Integer> columnIndexes = new HashMap<>();
-	private final Map<String, Field> columnField = new HashMap<>();
+    private String tableName;
+    private String primaryKey;
+    private ConnectionType connectionType;
+    private String commaSeparatedColumns;
+    private final List<Field> fields = new ArrayList<>();
+    private final List<String> columns = new ArrayList<>();
+    private final Map<String, FieldType> columnMapping = new HashMap<>();
+    private final Map<String, Integer> columnIndexes = new HashMap<>();
+    private final Map<String, Field> columnField = new HashMap<>();
 
-	private static final int BATCH_SIZE = Config.getInt(ConfigKeys.BATCH_SIZE);
+    private static final int BATCH_SIZE = Config.getInt(ConfigKeys.BATCH_SIZE);
 
-	private static final Object LOCK = new Object();
+    private static final Object LOCK = new Object();
 
-	private static final Logger LOGGER = Logger.getLogger(GenericDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GenericDao.class.getName());
 
-	public GenericDao() {
-		this.init();
-	}
+    public GenericDao() {
+        this.init();
+    }
 
-	/**
-	 * Populates {@code Dao} data structures needed for later use such as
-	 * {@code tableName, java.lang.reflect.Field, commaSeparatedColumns}
-	 * {@code columnMapping}(maps column name to its type),
-	 * {@code columnIndexes}(maps column name to its index),
-	 * {@code columnField}(maps column name to its {@code java.lang.reflect.Field}
-	 * type to minimize unnecessary reflection calls
-	 */
-	private void init() {
-		this.configTableMetadata();
-		this.configColumnMetadata();
-	}
+    /**
+     * Populates {@code Dao} data structures needed for later use such as
+     * {@code tableName, java.lang.reflect.Field, commaSeparatedColumns}
+     * {@code columnMapping}(maps column name to its type),
+     * {@code columnIndexes}(maps column name to its index),
+     * {@code columnField}(maps column name to its
+     * {@code java.lang.reflect.Field} type to minimize unnecessary reflection
+     * calls
+     */
+    private void init() {
+        this.configTableMetadata();
+        this.configColumnMetadata();
+    }
 
-	private void configTableMetadata() {
-		try {
-			Annotation tableMetadata = dto.getClass().getAnnotation(Table.class);
-			this.tableName = tableMetadata.annotationType().getDeclaredMethod("name")
-					.invoke(tableMetadata, (Object[]) null).toString();
-			this.connectionType = (ConnectionType) tableMetadata.annotationType().getDeclaredMethod("connectionType")
-					.invoke(tableMetadata, (Object[]) null);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    private void configTableMetadata() {
+        try {
+            Annotation tableMetadata = dto.getClass().getAnnotation(Table.class);
+            this.tableName = tableMetadata.annotationType().getDeclaredMethod("name").invoke(tableMetadata, (Object[]) null).toString();
+            this.connectionType = (ConnectionType) tableMetadata.annotationType().getDeclaredMethod("connectionType").invoke(tableMetadata, (Object[]) null);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-	private void configColumnMetadata() {
-		int[] index = { 0 };
-		for (Field field : dto.getClass().getDeclaredFields()) {
-			Annotation columnMetadata = field.getAnnotation(Column.class);
-			if (columnMetadata != null) {
-				field.setAccessible(Boolean.TRUE);
-				fields.add(field);
-				try {
-					String columnName = columnMetadata.annotationType().getDeclaredMethod("name")
-							.invoke(columnMetadata, (Object[]) null).toString();
-					FieldType fieldType = (FieldType) columnMetadata.annotationType().getDeclaredMethod("type")
-							.invoke(columnMetadata, (Object[]) null);
+    private void configColumnMetadata() {
+        int[] index = {0};
+        Class clazz = dto.getClass();
+        boolean rollOn = true;
+        while (rollOn) { // cuz of inheritance of classes (ie. extends Model)
+            for (Field field : clazz.getDeclaredFields()) {
+                Annotation columnMetadata = field.getAnnotation(Column.class);
+                if (columnMetadata != null) {
+                    field.setAccessible(Boolean.TRUE);
+                    fields.add(field);
+                    try {
+                        String columnName = columnMetadata.annotationType().getDeclaredMethod("name").invoke(columnMetadata, (Object[]) null).toString();
+                        FieldType fieldType = (FieldType) columnMetadata.annotationType().getDeclaredMethod("type").invoke(columnMetadata, (Object[]) null);
 
-					columnMapping.put(columnName, fieldType);
-					columnIndexes.put(columnName, ++index[0]);
-					columnField.put(columnName, field);
-					columns.add(columnName);
+                        columnMapping.put(columnName, fieldType);
+                        columnIndexes.put(columnName, ++index[0]);
+                        columnField.put(columnName, field);
+                        columns.add(columnName);
+                        boolean isPk;
 
-					boolean isPk = (boolean) columnMetadata.annotationType().getDeclaredMethod("primaryKey")
-							.invoke(columnMetadata, (Object[]) null);
-					if (isPk)
-						primaryKey = columnName;
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, e.getMessage());
-				}
-			}
-		}
-		commaSeparatedColumns = columns.stream().collect(Collectors.joining(","));
-	}
+                        try {
+                            isPk = (boolean) columnMetadata.annotationType().getDeclaredMethod("primaryKey").invoke(columnMetadata, (Object[]) null);
+                        } catch (NoSuchMethodException ex) {
+                            isPk = Boolean.FALSE;
+                        }
+                        if (isPk) {
+                            primaryKey = columnName;
+                        }
+                    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage());
+                    }
+                }
+            }
 
-	public Dto getById(long id) {
-		try (Connection conn = getConnection();
-				Statement st = conn.createStatement();
-				ResultSet rs = st
-						.executeQuery("SELECT " + commaSeparatedColumns + " FROM " + tableName + " WHERE ID=" + id);) {
-			if (rs.next()) {
-				return fromResultSet(rs);
-			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return null;
-	}
+            if (clazz.equals(Model.class)) {
+                rollOn = false;
+            }
+            clazz = clazz.getSuperclass();
+        }
+        commaSeparatedColumns = columns.stream().collect(Collectors.joining(","));
+    }
 
-	/* Used only on producer connections! */
-	public long insert(Dto dto) {
-		String insert = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") " + " VALUES " + buildWildCards();
-		String generatedColumns[] = { "ID" };
-		try (Connection conn = getConnection();
-				PreparedStatement ps = conn.prepareStatement(insert, generatedColumns);) {
-			synchronized (this) {
-				toPreparedStatement(ps, dto);
-				ps.executeUpdate();
-				ResultSet generatedKeys = ps.getGeneratedKeys();
-				if (generatedKeys.next()) {
-					conn.commit();
-					return generatedKeys.getLong(1);
-				}
-			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return 0;
-	}
+    public Dto getById(long id) {
+        try (Connection conn = getConnection();
+                Statement st = conn.createStatement();
+                ResultSet rs = st
+                        .executeQuery("SELECT " + commaSeparatedColumns + " FROM " + tableName + " WHERE ID=" + id);) {
+            if (rs.next()) {
+                return fromResultSet(rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return null;
+    }
 
-	public long insert(List<Dto> dtos) {
-		long size = 0;
-		String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
-		try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
-			dtos.parallelStream().forEach(dto -> {
-				toPreparedStatementBatch(ps, dto);
-			});
+    /* Used only on producer connections! */
+    public long insert(Dto dto) {
+        String insert = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") " + " VALUES " + buildWildCards();
+        String generatedColumns[] = {"ID"};
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(insert, generatedColumns);) {
+            synchronized (this) {
+                toPreparedStatement(ps, dto);
+                ps.executeUpdate();
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    conn.commit();
+                    return generatedKeys.getLong(1);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return 0;
+    }
 
-			size += ps.executeBatch().length;
-			conn.commit();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return size;
-	}
+    public long insert(List<Dto> dtos) {
+        long size = 0;
+        String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
+            dtos.parallelStream().forEach(dto -> {
+                toPreparedStatementBatch(ps, dto);
+            });
 
-	/**
-	 * 
-	 * @param dtos: stream of initial data that can be transformed into resulting
-	 *              data by using {@code Transformable} interface
-	 * @return number of inserted rows
-	 */
-	public <T extends Transformable<Dto>> long insert(Stream<T> transformableStream) {
-		long size = 0;
-		TimeMesure tm = new TimeMesure("Insert from " + Thread.currentThread().getId());
-		String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
-		try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query);) {
-			transformableStream.parallel().map(Transformable::transform).forEach(dto -> {
-				toPreparedStatementBatch(ps, dto);
-			});
-			size += ps.executeBatch().length;
-			conn.commit();
-			tm.result();
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return size;
-	}
+            size += ps.executeBatch().length;
+            conn.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return size;
+    }
 
-	public Dto update(Dto dto) {
-		String update = buildUpdateStatement(primaryKey + "=" + getPrimaryKeyValue(dto));
-		try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(update)) {
-			toPreparedStatement(ps, dto);
-			ps.executeUpdate();
-			conn.commit();
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+    /**
+     *
+     * @param dtos: stream of initial data that can be transformed into
+     * resulting data by using {@code Transformable} interface
+     * @return number of inserted rows
+     */
+    public <T extends Transformable<Dto>> long insert(Stream<T> transformableStream) {
+        long size = 0;
+        TimeMesure tm = new TimeMesure("Insert from " + Thread.currentThread().getId());
+        String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query);) {
+            transformableStream.parallel().map(Transformable::transform).forEach(dto -> {
+                toPreparedStatementBatch(ps, dto);
+            });
+            size += ps.executeBatch().length;
+            conn.commit();
+            tm.result();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return size;
+    }
 
-		return dto;
-	}
-	
-	private Object getPrimaryKeyValue(Dto dto) {
-		Object pkVal = null;
-		try {
-			pkVal = columnField.get(primaryKey).get(dto);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return pkVal;
-	}
+    public Dto update(Dto dto) {
+        String update = buildUpdateStatement(primaryKey + "=" + getPrimaryKeyValue(dto));
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(update)) {
+            toPreparedStatement(ps, dto);
+            ps.executeUpdate();
+            conn.commit();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
-	private String buildUpdateStatement(String where) {
-		StringBuilder update = new StringBuilder();
-		update.append("UPDATE ").append(tableName).append(" SET");
-		update.append(columns.stream().map(c -> (c + "=?")).collect(Collectors.joining(",", " ", " ")));
-		if (where != null) {
-			update.append("WHERE ").append(where);
-		}
-		LOGGER.info("UPDATE: " + update);
-		return update.toString();
-	}
+        return dto;
+    }
 
-	public long update(List<Dto> dtos) {
-		long size = 0;
-		String query = "UPDATE " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
-		try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
-			dtos.parallelStream().forEach(dto -> {
-				toPreparedStatementBatch(ps, dto);
-			});
+    private Object getPrimaryKeyValue(Dto dto) {
+        Object pkVal = null;
+        try {
+            pkVal = columnField.get(primaryKey).get(dto);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return pkVal;
+    }
 
-			size += ps.executeBatch().length;
-			conn.commit();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return size;
-	}
+    private String buildUpdateStatement(String where) {
+        StringBuilder update = new StringBuilder();
+        update.append("UPDATE ").append(tableName).append(" SET");
+        update.append(columns.stream().map(c -> (c + "=?")).collect(Collectors.joining(",", " ", " ")));
+        if (where != null) {
+            update.append("WHERE ").append(where);
+        }
+        LOGGER.info("UPDATE: " + update);
+        return update.toString();
+    }
 
-	public List<Dto> loadList(String where, String orderBy, int offset, int limit) {
-		List<Dto> dtos = new ArrayList<>();
-		try (Connection conn = getConnection();
-				Statement st = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-				ResultSet rs = st.executeQuery(makeSql(where, orderBy, offset, limit))) {
-			while (rs.next()) {
-				dtos.add(fromResultSet(rs));
-			}
-			return dtos;
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-		return null;
-	}
+    public long update(List<Dto> dtos) {
+        long size = 0;
+        String query = "UPDATE " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
+            dtos.parallelStream().forEach(dto -> {
+                toPreparedStatementBatch(ps, dto);
+            });
 
-	public List<Dto> loadList(String where, String orderBy) {
-		return this.loadList(where, orderBy, -1, -1);
-	}
+            size += ps.executeBatch().length;
+            conn.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return size;
+    }
 
-	public List<Dto> loadList(String where, int offset, int limit) {
-		return this.loadList(where, null, offset, limit);
-	}
+    public List<Dto> loadList(String where, String orderBy, int offset, int limit) {
+        List<Dto> dtos = new ArrayList<>();
+        try (Connection conn = getConnection();
+                Statement st = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                ResultSet rs = st.executeQuery(makeSql(where, orderBy, offset, limit))) {
+            while (rs.next()) {
+                dtos.add(fromResultSet(rs));
+            }
+            return dtos;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return null;
+    }
 
-	public List<Dto> loadList(String where) {
-		return this.loadList(where, null, -1, -1);
-	}
+    public List<Dto> loadList(String where, String orderBy) {
+        return this.loadList(where, orderBy, -1, -1);
+    }
 
-	// HELPER METHODS...
+    public List<Dto> loadList(String where, int offset, int limit) {
+        return this.loadList(where, null, offset, limit);
+    }
 
-	private String makeSql(String where, String orderBy, int offset, int limit) {
-		StringBuilder sql = new StringBuilder("SELECT ");
-		sql.append(commaSeparatedColumns).append(" FROM ").append(tableName);
-		if (where != null) {
-			sql.append(" WHERE ").append(where);
-		}
-		if (orderBy != null) {
-			sql.append(" ORDER BY ").append(orderBy);
-		} else {
-			sql.append(" ORDER BY ").append("ID ASC"); // default ord
-		}
-		if (offset > 0) {
-			sql.append(" OFFSET ").append(offset).append(" ROWS ");
-		}
-		if (limit > 0) {
-			sql.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY ");
-		}
-		System.out.println(sql.toString());
-		return sql.toString();
-	}
+    public List<Dto> loadList(String where) {
+        return this.loadList(where, null, -1, -1);
+    }
 
-	private void toPreparedStatement(PreparedStatement ps, Dto dto) {
-		columns.forEach(column -> {
-			Field field = columnField.get(column);
-			int index = columnIndexes.get(column);
-			try {
-				Object object = field.get(dto);
-				if (object != null) {
-					ps.setObject(index, object);
-				} else {
-					ps.setString(index, null);
-				}
+    // HELPER METHODS...
+    private String makeSql(String where, String orderBy, int offset, int limit) {
+        StringBuilder sql = new StringBuilder("SELECT ");
+        sql.append(commaSeparatedColumns).append(" FROM ").append(tableName);
+        if (where != null) {
+            sql.append(" WHERE ").append(where);
+        }
+        if (orderBy != null) {
+            sql.append(" ORDER BY ").append(orderBy);
+        } else {
+            sql.append(" ORDER BY ").append("ID ASC"); // default ord
+        }
+        if (offset > 0) {
+            sql.append(" OFFSET ").append(offset).append(" ROWS ");
+        }
+        if (limit > 0) {
+            sql.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY ");
+        }
+        System.out.println(sql.toString());
+        return sql.toString();
+    }
 
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
-			}
-		});
-	}
+    private void toPreparedStatement(PreparedStatement ps, Dto dto) {
+        columns.forEach(column -> {
+            Field field = columnField.get(column);
+            int index = columnIndexes.get(column);
+            try {
+                Object object = field.get(dto);
+                if (object != null) {
+                    ps.setObject(index, object);
+                } else {
+                    ps.setString(index, null);
+                }
 
-	private void toPreparedStatementBatch(PreparedStatement ps, Dto dto) {
-		toPreparedStatement(ps, dto);
-		try {
-			ps.addBatch();
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-		}
-	}
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e.getMessage());
+            }
+        });
+    }
 
-	private Dto fromResultSet(ResultSet rs) {
-		Dto dto = newDto();
-		columnMapping.entrySet().stream().forEach(entry -> {
-			Field f = columnField.get(entry.getKey());
-			try {
-				f.set(dto, getObjectFromRs(entry, rs));
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
-			}
-		});
+    private void toPreparedStatementBatch(PreparedStatement ps, Dto dto) {
+        toPreparedStatement(ps, dto);
+        try {
+            ps.addBatch();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-		return dto;
-	}
+    private Dto fromResultSet(ResultSet rs) {
+        Dto dto = newDto();
+        columnMapping.entrySet().stream().forEach(entry -> {
+            Field f = columnField.get(entry.getKey());
+            try {
+                f.set(dto, getObjectFromRs(entry, rs));
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e.getMessage());
+            }
+        });
 
-	// TODO: handle all types
-	private Object getObjectFromRs(Entry<String, FieldType> e, ResultSet rs) throws SQLException {
-		switch (e.getValue()) {
-		case LONG:
-			return rs.getLong(e.getKey());
-		case STRING:
-			return rs.getString(e.getKey());
-		case INT:
-			return rs.getInt(e.getKey());
-		case DATE:
-			return rs.getDate(e.getKey());
-		case BOOLEAN:
-			return rs.getBoolean(e.getKey());
-		case BLOB:
-			return rs.getBytes(e.getKey());
-		case UNKNOWN:
-			return rs.getObject(e.getKey());
-		default:
-			break;
-		}
-		return null;
-	}
+        return dto;
+    }
 
-	private String buildWildCards() {
-		return fields.stream().map(f -> "?").collect(Collectors.joining(",", "(", ")"));
-	}
+    // TODO: handle all types
+    private Object getObjectFromRs(Entry<String, FieldType> e, ResultSet rs) throws SQLException {
+        switch (e.getValue()) {
+            case LONG:
+                return rs.getLong(e.getKey());
+            case STRING:
+                return rs.getString(e.getKey());
+            case INT:
+                return rs.getInt(e.getKey());
+            case DATE:
+                return rs.getDate(e.getKey());
+            case BOOLEAN:
+                return rs.getBoolean(e.getKey());
+            case BLOB:
+                return rs.getBytes(e.getKey());
+            case UNKNOWN:
+                return rs.getObject(e.getKey());
+            default:
+                break;
+        }
+        return null;
+    }
 
-	private Connection getConnection() {
-		return ConnectionManager.getInstance().getConnection(connectionType);
-	}
+    private String buildWildCards() {
+        return fields.stream().map(f -> "?").collect(Collectors.joining(",", "(", ")"));
+    }
+
+    private Connection getConnection() {
+        return ConnectionManager.getInstance().getConnection(connectionType);
+    }
 }

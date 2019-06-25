@@ -18,7 +18,7 @@ import app.utils.Transformable;
  */
 public class Model implements Serializable, Transformable {
 
-    @Column(name = "id", type = FieldType.LONG)
+    @Column(name = "id", type = FieldType.LONG, primaryKey = true)
     private Long id;
 
     @Override

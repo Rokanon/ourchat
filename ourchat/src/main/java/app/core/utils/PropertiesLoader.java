@@ -5,6 +5,9 @@ import java.util.Properties;
 
 public class PropertiesLoader {
 
+    private PropertiesLoader() {
+    }
+
     public static Properties getProperties(String fileName) {
         Properties properties = null;
         try {
