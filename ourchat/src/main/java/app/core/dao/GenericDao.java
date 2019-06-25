@@ -184,8 +184,8 @@ public abstract class GenericDao<Dto extends Serializable> {
 
     /**
      *
-     * @param dtos: stream of initial data that can be transformed into
-     * resulting data by using {@code Transformable} interface
+     * @param <T>
+     * @param transformableStream
      * @return number of inserted rows
      */
     public <T extends Transformable<Dto>> long insert(Stream<T> transformableStream) {
@@ -193,8 +193,8 @@ public abstract class GenericDao<Dto extends Serializable> {
         TimeMesure tm = new TimeMesure("Insert from " + Thread.currentThread().getId());
         String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query);) {
-            transformableStream.parallel().map(Transformable::transform).forEach(dto -> {
-                toPreparedStatementBatch(ps, dto);
+            transformableStream.parallel().map(Transformable::transform).forEach(tmpDto -> {
+                toPreparedStatementBatch(ps, tmpDto);
             });
             size += ps.executeBatch().length;
             conn.commit();
@@ -207,10 +207,10 @@ public abstract class GenericDao<Dto extends Serializable> {
 
     public Dto update(Dto dto) {
         String update = buildUpdateStatement(primaryKey + "=" + getPrimaryKeyValue(dto));
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(update)) {
+        try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(update)) {
             toPreparedStatement(ps, dto);
             ps.executeUpdate();
-            conn.commit();
+            connection.commit();
         } catch (Exception e) {
             // TODO: handle exception
         }

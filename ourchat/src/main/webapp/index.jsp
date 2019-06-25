@@ -12,6 +12,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="resources/js/jquery-3.1.1.min.js"></script>
         <title>Ourchat</title>
     </head>
     <body>
@@ -20,5 +21,35 @@
         <div>
             ${userPublicBean.user.toJson()}
         </div>
+
+        <button id="js-button-make-profile">Make profile</button>
+
+        <script>
+            $("#js-button-make-profile").on("click", function () {
+                let params = {};
+
+                params.userId = "${userPublicBean.user.id}";
+
+                $.ajax({
+                    url: "/ourchat/make/profile",
+                    data: params,
+                    type: "get",
+                    
+                    beforeSend: function (xhr) {
+                        console.log("before");
+                    },
+                    complete: function (jqXHR, textStatus) {
+                        console.log("complete");
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log("success");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log("error");
+                    }
+                })
+            });
+        </script>
+
     </body>
 </html>

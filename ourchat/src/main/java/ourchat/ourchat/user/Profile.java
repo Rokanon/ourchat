@@ -5,15 +5,22 @@
  */
 package ourchat.ourchat.user;
 
+import app.core.dao.annotations.Column;
+import app.core.dao.annotations.Table;
+import app.core.dao.enums.ConnectionType;
+import app.core.dao.enums.FieldType;
 import ourchat.ourchat.base.Model;
 
 /**
  *
  * @author dark
  */
+@Table(name = "profile", connectionType = ConnectionType.PRODUCER)
 public class Profile extends Model {
     
+    @Column(name = "user_id", type = FieldType.LONG)
     private Long userId;
+    @Column(name = "name", type = FieldType.STRING)
     private String name;
 
     /**
