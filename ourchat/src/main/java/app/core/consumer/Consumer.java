@@ -4,9 +4,9 @@ import app.core.utils.LogicChooser;
 
 public class Consumer implements Runnable {
 
-	@Override
-	public void run() {
-		LogicChooser.chooseConsumerLogic().execute();
-	}
+    @Override
+    public void run() {
+        LogicChooser.chooseConsumerLogic().execute();
+    }
 
 }

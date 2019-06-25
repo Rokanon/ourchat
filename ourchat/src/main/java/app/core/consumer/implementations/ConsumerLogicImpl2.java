@@ -1,6 +1,6 @@
-package rs.netset.consumer.implementations;
+package app.core.consumer.implementations;
 
-import rs.netset.consumer.ConsumerLogic;
+import app.core.consumer.ConsumerLogic;
 
 public class ConsumerLogicImpl2 extends ConsumerLogic {
 

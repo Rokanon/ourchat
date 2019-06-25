@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import rs.netset.utils.TimeMesure;
+import app.core.utils.TimeMesure;
 
 /**
  * Not fully implemented yet
