@@ -5,7 +5,9 @@
  */
 package ourchat.ourchat.user.publicBeans;
 
+import ourchat.ourchat.user.Profile;
 import ourchat.ourchat.user.User;
+import ourchat.ourchat.user.dao.ProfileDao;
 import ourchat.ourchat.user.dao.UserDao;
 
 /**
@@ -15,9 +17,11 @@ import ourchat.ourchat.user.dao.UserDao;
 public class UserPublicBean {
 
     private User user;
+    private Profile profile;
     
     public UserPublicBean() {
         user = new UserDao().getById(1);
+        profile = new ProfileDao().getById(1);
     }
 
     /**
@@ -25,6 +29,13 @@ public class UserPublicBean {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * @return the profile
+     */
+    public Profile getProfile() {
+        return profile;
     }
     
 }

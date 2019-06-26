@@ -6,20 +6,20 @@
 package ourchat.ourchat.user.dao;
 
 import app.core.dao.GenericDao;
-import ourchat.ourchat.user.User;
+import ourchat.ourchat.user.Profile;
 
 /**
  *
  * @author dark
  */
-public class UserDao extends GenericDao<User> {
+public class ProfileDao extends GenericDao<Profile> {
 
     @Override
-    protected User newDto() {
-        return new User();
+    protected Profile newDto() {
+        return new Profile();
     }
 
-    public UserDao() {
+    public ProfileDao() {
         super();
     }
 
