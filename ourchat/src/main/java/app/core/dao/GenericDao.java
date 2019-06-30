@@ -11,14 +11,11 @@ import app.core.utils.ConfigKeys;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,14 +146,14 @@ public abstract class GenericDao<Dto extends Serializable> {
     public long insert(Dto dto) {
         String insert = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") " + " VALUES " + buildWildCards();
         String generatedColumns[] = {"ID"};
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(insert, generatedColumns);) {
+        try (Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement(insert, generatedColumns);) {
             synchronized (this) {
                 toPreparedStatement(ps, dto);
                 ps.executeUpdate();
                 ResultSet generatedKeys = ps.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    conn.commit();
+                    connection.commit();
                     return generatedKeys.getLong(1);
                 }
             }
@@ -169,13 +166,14 @@ public abstract class GenericDao<Dto extends Serializable> {
     public long insert(List<Dto> dtos) {
         long size = 0;
         String query = "INSERT INTO " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
+        try (Connection connection = getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             dtos.parallelStream().forEach(dto -> {
-                toPreparedStatementBatch(ps, dto);
+                toPreparedStatementBatch(preparedStatement, dto);
             });
 
-            size += ps.executeBatch().length;
-            conn.commit();
+            size += preparedStatement.executeBatch().length;
+            connection.commit();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
@@ -218,27 +216,6 @@ public abstract class GenericDao<Dto extends Serializable> {
         return dto;
     }
 
-    private Object getPrimaryKeyValue(Dto dto) {
-        Object pkVal = null;
-        try {
-            pkVal = columnField.get(primaryKey).get(dto);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return pkVal;
-    }
-
-    private String buildUpdateStatement(String where) {
-        StringBuilder update = new StringBuilder();
-        update.append("UPDATE ").append(tableName).append(" SET");
-        update.append(columns.stream().map(c -> (c + "=?")).collect(Collectors.joining(",", " ", " ")));
-        if (where != null) {
-            update.append("WHERE ").append(where);
-        }
-        LOGGER.info("UPDATE: " + update);
-        return update.toString();
-    }
-
     public long update(List<Dto> dtos) {
         long size = 0;
         String query = "UPDATE " + tableName + "(" + commaSeparatedColumns + ") VALUES " + buildWildCards();
@@ -253,6 +230,46 @@ public abstract class GenericDao<Dto extends Serializable> {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
         return size;
+    }
+
+    private String buildUpdateStatement(String where) {
+        StringBuilder update = new StringBuilder();
+        update.append("UPDATE ").append(tableName).append(" SET");
+        update.append(columns.stream().map(c -> (c + "=?")).collect(Collectors.joining(",", " ", " ")));
+        if (where != null) {
+            update.append("WHERE ").append(where);
+        }
+        LOGGER.info("UPDATE: " + update);
+        return update.toString();
+    }
+
+    public Boolean delete(Long id) {
+
+        String query = "DELETE FROM " + tableName + " WHERE id = " + id;
+
+        try (Connection connection = getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            Boolean success = preparedStatement.execute();
+            connection.commit();
+
+            return success;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(GenericDao.class.getName()).log(Level.SEVERE, null, ex);
+            return Boolean.FALSE;
+        }
+
+    }
+
+    private Object getPrimaryKeyValue(Dto dto) {
+        Object pkVal = null;
+        try {
+            pkVal = columnField.get(primaryKey).get(dto);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return pkVal;
     }
 
     public List<Dto> loadList(String where, String orderBy, int offset, int limit) {
@@ -270,23 +287,50 @@ public abstract class GenericDao<Dto extends Serializable> {
         return null;
     }
 
+    public <DtoX extends Dto> List<DtoX> loadList(String where, String orderBy, int offset, int limit, Class<DtoX> clazz) {
+        List<DtoX> dtosX = new ArrayList<>();
+        try (Connection connection = getConnection();
+                Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                ResultSet resultSet = statement.executeQuery(makeSql(where, orderBy, offset, limit))) {
+            while (resultSet.next()) {
+                dtosX.add((DtoX) fromResultSet(resultSet));
+            }
+            return dtosX;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+        }
+        return null;
+    }
+
     public List<Dto> loadList(String where, String orderBy) {
         return this.loadList(where, orderBy, -1, -1);
+    }
+
+    public <DtoX extends Dto> List<DtoX> loadList(String where, String orderBy, Class<DtoX> clazz) {
+        return this.loadList(where, orderBy, -1, -1, clazz);
     }
 
     public List<Dto> loadList(String where, int offset, int limit) {
         return this.loadList(where, null, offset, limit);
     }
 
+    public <DtoX extends Dto> List<DtoX> loadList(String where, int offset, int limit, Class<DtoX> clazz) {
+        return this.loadList(where, null, offset, limit, clazz);
+    }
+
     public List<Dto> loadList(String where) {
         return this.loadList(where, null, -1, -1);
+    }
+
+    public <DtoX extends Dto> List<DtoX> loadList(String where, Class<DtoX> clazz) {
+        return this.loadList(where, null, -1, -1, clazz);
     }
 
     // HELPER METHODS...
     private String makeSql(String where, String orderBy, int offset, int limit) {
         StringBuilder sql = new StringBuilder("SELECT ");
         sql.append(commaSeparatedColumns).append(" FROM ").append(tableName);
-        if (where != null) {
+        if (where != null && !"".equals(where)) {
             sql.append(" WHERE ").append(where);
         }
         if (orderBy != null) {

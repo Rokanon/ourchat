@@ -1,13 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ourchat.ourchat.user.publicBeans;
 
-import ourchat.ourchat.user.Profile;
 import ourchat.ourchat.user.User;
-import ourchat.ourchat.user.dao.ProfileDao;
 import ourchat.ourchat.user.dao.UserDao;
 
 /**
@@ -16,26 +9,28 @@ import ourchat.ourchat.user.dao.UserDao;
  */
 public class UserPublicBean {
 
+    private Long userId;
     private User user;
-    private Profile profile;
-    
+
     public UserPublicBean() {
-        user = new UserDao().getById(1);
-        profile = new ProfileDao().getById(1);
+
     }
 
     /**
      * @return the user
      */
     public User getUser() {
+        if (null == user && userId != null && userId > 0) {
+            user = new UserDao().getById(userId);
+        }
         return user;
     }
 
     /**
-     * @return the profile
+     * @param userId the userId to set
      */
-    public Profile getProfile() {
-        return profile;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
-    
+
 }

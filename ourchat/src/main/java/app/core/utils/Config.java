@@ -10,11 +10,20 @@ public class Config {
         return CONFIG.getProperty(key);
     }
 
-    public static int getInt(String key) {
-        return Integer.parseInt(get(key));
+    public static Integer getInt(String key) {
+        try {
+            return Integer.parseInt(get(key));
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
-    public static long getLong(String key) {
-        return Long.parseLong(get(key));
+    public static Long getLong(String key) {
+
+        try {
+            return Long.parseLong(get(key));
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }

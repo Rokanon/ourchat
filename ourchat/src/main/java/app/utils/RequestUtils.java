@@ -88,13 +88,18 @@ public class RequestUtils {
             String[] ketValueParams = bufferedReader.readLine().split("&");
             for (String keyValuePair : ketValueParams) {
                 String[] pairs = keyValuePair.trim().split("=");
-                if (!parameterMap.containsKey(pairs[0])) {
-                    parameterMap.put(pairs[0], pairs[1]);
+                String key = pairs[0];
+                String value = null;
 
+                if (pairs.length > 1) {
+                    value = pairs[1];
+                }
+                if (!parameterMap.containsKey(key)) {
+                    parameterMap.put(key, value);
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(RequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RequestUtils.class.getName()).log(Level.SEVERE, "Filling param map failed", ex);
             parameterMap = new HashMap<>();
         }
     }

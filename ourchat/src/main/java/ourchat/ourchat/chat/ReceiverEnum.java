@@ -23,6 +23,9 @@ public enum ReceiverEnum {
      * @return enum with String value of param value or unknown enum
      */
     public static ReceiverEnum toEnum(String value) {
+        if (null == value) {
+            return ReceiverEnum.unknown;
+        }
         for (ReceiverEnum receiverEnum : ReceiverEnum.values()) {
             if (receiverEnum.toString().equals(value)) {
                 return receiverEnum;

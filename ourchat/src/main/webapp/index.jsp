@@ -12,6 +12,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="resources/js/jquery-3.1.1.min.js"></script>
         <script src="resources/js/ajax.js"></script>
+        <script src="resources/js/util.js"></script>
+        <link rel="stylesheet" type="text/css" href="/resources/css/app.css">
         <title>Ourchat</title>
     </head>
     <body>
@@ -20,10 +22,10 @@
         <div id="content"></div>
     </body>
     <script>
-//        $(document).ready(function() {
-//            $("#content").load("/ourchat/ajaxPages/test.jsp", {}, function() {
-//                console.log("test content loaded");
-//            });
-//        });
+        $(document).ready(function () {
+            $("#content").load("/ajaxPages/main.jsp", {}, function () {
+                console.log("main content loaded");
+            });
+        });
     </script>
 </html>
