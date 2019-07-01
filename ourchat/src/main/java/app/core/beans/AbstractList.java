@@ -1,7 +1,7 @@
 package app.core.beans;
 
 import java.util.List;
-import ourchat.base.Model;
+import app.core.domain.Model;
 
 /**
  *

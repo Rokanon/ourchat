@@ -5,7 +5,7 @@
  */
 package test;
 
-import app.utils.Transformable;
+import app.core.utils.Transformable;
 import java.io.Serializable;
 import java.util.Date;
 import org.json.JSONObject;

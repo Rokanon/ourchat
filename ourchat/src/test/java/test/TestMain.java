@@ -5,10 +5,10 @@
  */
 package test;
 
-import app.utils.ConnectionProperties;
+import app.core.utils.ConnectionProperties;
 import java.sql.Connection;
-import ourchat.user.User;
-import ourchat.user.dao.UserDao;
+import app.ourchat.user.User;
+import app.ourchat.user.dao.UserDao;
 
 /**
  *

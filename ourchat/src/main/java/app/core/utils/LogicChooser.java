@@ -1,8 +1,8 @@
 package app.core.utils;
 
-import app.core.consumer.ConsumerLogic;
-import app.core.consumer.implementations.ConsumerLogicImpl1;
-import app.core.consumer.implementations.ConsumerLogicImpl2;
+import app.core.logic.ConsumerLogic;
+import app.core.logic.implementations.ConsumerLogicImpl1;
+import app.core.logic.implementations.ConsumerLogicImpl2;
 
 public class LogicChooser {
 
