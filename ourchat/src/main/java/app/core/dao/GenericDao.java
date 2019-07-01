@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import app.core.utils.TimeMesure;
 import java.lang.reflect.InvocationTargetException;
-import ourchat.ourchat.base.Model;
+import ourchat.base.Model;
 
 /**
  * Not fully implemented yet

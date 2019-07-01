@@ -1,9 +1,9 @@
-package ourchat.ourchat.user.publicBeans;
+package ourchat.user.publicBeans;
 
 import app.core.beans.AbstractList;
 import java.util.List;
-import ourchat.ourchat.user.Profile;
-import ourchat.ourchat.user.dao.ProfileDao;
+import ourchat.user.Profile;
+import ourchat.user.dao.ProfileDao;
 
 /**
  *

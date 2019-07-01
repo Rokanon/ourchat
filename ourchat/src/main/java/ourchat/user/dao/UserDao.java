@@ -3,23 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ourchat.ourchat.user.dao;
+package ourchat.user.dao;
 
 import app.core.dao.GenericDao;
-import ourchat.ourchat.user.Profile;
+import ourchat.user.User;
 
 /**
  *
  * @author dark
  */
-public class ProfileDao extends GenericDao<Profile> {
+public class UserDao extends GenericDao<User> {
 
     @Override
-    protected Profile newDto() {
-        return new Profile();
+    protected User newDto() {
+        return new User();
     }
 
-    public ProfileDao() {
+    public UserDao() {
         super();
     }
 

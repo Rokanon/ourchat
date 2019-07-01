@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ourchat.ourchat.user.logic;
+package ourchat.user.logic;
 
 import app.core.servlet.Restable;
 import app.utils.RequestUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ourchat.ourchat.user.Profile;
-import ourchat.ourchat.user.dao.ProfileDao;
+import ourchat.user.Profile;
+import ourchat.user.dao.ProfileDao;
 
 /**
  *

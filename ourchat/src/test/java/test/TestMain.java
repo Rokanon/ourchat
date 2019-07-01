@@ -7,8 +7,8 @@ package test;
 
 import app.utils.ConnectionProperties;
 import java.sql.Connection;
-import ourchat.ourchat.user.User;
-import ourchat.ourchat.user.dao.UserDao;
+import ourchat.user.User;
+import ourchat.user.dao.UserDao;
 
 /**
  *

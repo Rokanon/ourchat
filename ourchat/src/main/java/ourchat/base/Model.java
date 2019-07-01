@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ourchat.ourchat.base;
+package ourchat.base;
 
 import app.core.dao.annotations.Column;
 import app.core.dao.enums.FieldType;

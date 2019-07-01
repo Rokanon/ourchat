@@ -1,7 +1,7 @@
-package ourchat.ourchat.user.publicBeans;
+package ourchat.user.publicBeans;
 
-import ourchat.ourchat.user.User;
-import ourchat.ourchat.user.dao.UserDao;
+import ourchat.user.User;
+import ourchat.user.dao.UserDao;
 
 /**
  *

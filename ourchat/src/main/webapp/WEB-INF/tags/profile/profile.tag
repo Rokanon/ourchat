@@ -1,6 +1,6 @@
 <%@tag description="Tag describing the profile" pageEncoding="UTF-8"%>
 
-<%@attribute name="profile" required="true" type="ourchat.ourchat.user.Profile" description="profile"%>
+<%@attribute name="profile" required="true" type="ourchat.user.Profile" description="profile"%>
 
 <h2>${profile.name}</h2>
 <button class="js-edit-profile-button" data-tab="edit" data-user-id="${profile.userId}">Edit</button>

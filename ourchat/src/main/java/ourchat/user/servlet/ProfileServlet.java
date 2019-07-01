@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ourchat.ourchat.user.servlet;
+package ourchat.user.servlet;
 
 import app.core.servlet.AbstractServlet;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ourchat.ourchat.user.logic.ProfileServletLogic;
+import ourchat.user.logic.ProfileServletLogic;
 
 /**
  *

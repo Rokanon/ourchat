@@ -1,10 +1,10 @@
-package ourchat.ourchat.user;
+package ourchat.user;
 
 import app.core.dao.annotations.Column;
 import app.core.dao.annotations.Table;
 import app.core.dao.enums.ConnectionType;
 import app.core.dao.enums.FieldType;
-import ourchat.ourchat.base.Model;
+import ourchat.base.Model;
 
 @Table(name = "user", connectionType = ConnectionType.PRODUCER)
 public class User extends Model {
