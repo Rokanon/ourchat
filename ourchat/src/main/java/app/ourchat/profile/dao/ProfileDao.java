@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.ourchat.user.dao;
+package app.ourchat.profile.dao;
 
 import app.core.db.dao.GenericDao;
-import app.ourchat.user.Profile;
+import app.ourchat.profile.model.Profile;
 
 /**
  *

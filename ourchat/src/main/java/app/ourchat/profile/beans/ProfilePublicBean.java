@@ -1,7 +1,8 @@
-package app.ourchat.user.publicBeans;
+package app.ourchat.profile.beans;
 
-import app.ourchat.user.Profile;
-import app.ourchat.user.dao.ProfileDao;
+import app.ourchat.profile.model.Profile;
+import app.ourchat.profile.dao.ProfileDao;
+import app.ourchat.user.publicBeans.UserPublicBean;
 
 /**
  *

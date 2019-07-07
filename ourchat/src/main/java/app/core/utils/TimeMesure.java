@@ -19,8 +19,7 @@ public class TimeMesure {
     }
 
     public void result() {
-        LOGGER.info(
-                String.format("%s finished in %s", taskName, formatTimeDifference(startTime, LocalDateTime.now())));
+        LOGGER.info(String.format("%s finished in %s", taskName, formatTimeDifference(startTime, LocalDateTime.now())));
     }
 
     private String formatTimeDifference(LocalDateTime before, LocalDateTime toDateTime) {

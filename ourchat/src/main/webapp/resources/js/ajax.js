@@ -1,79 +1,53 @@
 function ajaxMake(url, params) {
-    $.ajax({
-        url: url,
-        data: params,
-        type: "put",
-        beforeSend: function (xhr) {
-            console.log("before make");
-        },
-        complete: function (jqXHR, textStatus) {
-            console.log("make finished");
-        },
-        success: function (data, textStatus, jqXHR) {
-            console.log("make success");
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log("make error");
-        }
-    });
+    ajaxFunction(url, params, "put");
 }
 
 function ajaxEdit(url, params) {
-    $.ajax({
-        url: url,
-        data: params,
-        type: "post",
-        beforeSend: function (xhr) {
-            console.log("before edit");
-        },
-        complete: function (jqXHR, textStatus) {
-            console.log("edit finished");
-        },
-        success: function (data, textStatus, jqXHR) {
-            console.log("edit success");
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log("edit error");
-        }
-    });
+    ajaxFunction(url, params, "post");
 }
 
 function ajaxRemove(url, params) {
-    $.ajax({
-        url: url,
-        data: params,
-        type: "put",
-        beforeSend: function (xhr) {
-            console.log("before remove");
-        },
-        complete: function (jqXHR, textStatus) {
-            console.log("remove finished");
-        },
-        success: function (data, textStatus, jqXHR) {
-            console.log("remove success");
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log("remove error");
-        }
-    });
+    ajaxFunction(url, params, "delete");
 }
 
 function ajaxView(url, params) {
+    ajaxFunction(url, params, "get");
+}
+
+function ajaxFunction(url, params, method) {
     $.ajax({
         url: url,
         data: params,
-        type: "get",
+        type: method,
         beforeSend: function (xhr) {
-            console.log("before view");
+            console.log("before " + method);
         },
         complete: function (jqXHR, textStatus) {
-            console.log("view finished");
+            console.log(method + " finished");
         },
         success: function (data, textStatus, jqXHR) {
-            console.log("view success");
+            console.log(method + " success");
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("view error");
+            console.log(method + " error");
+        },
+        statusCode: {
+            // data - json objects
+            // ok
+            200: function (data) {
+                if (exists(data.redirectUrl)) {
+                    window.location.href = data.redirectUrl;
+                }
+            },
+            400: function (data) {
+                if (exists(data.responseJSON.notification)) {
+                    $("#js-error-message").text(data.responseJSON.notification);
+                    setTimeout(function() {
+                        $("#js-error-message").text("");
+                    }, 5000);
+                }
+            }
         }
+
     });
 }

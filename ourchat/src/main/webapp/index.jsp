@@ -1,11 +1,7 @@
-<%-- 
-    Document   : index
-    Created on : May 25, 2019, 3:16:02 PM
-    Author     : dark
---%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
+<jsp:useBean id="profileSession" class="app.ourchat.profile.beans.ProfileSessionHandler" scope="session"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,6 +15,19 @@
     <body>
         <h1>Our chat!</h1>
         Chat freely with your friends and family. Its ours and its free.
+        
+        <div id="js-error-message"></div>
+        
+        <c:choose>
+            <c:when test="${profileSession.loggedIn}">
+                <button id="js-logout-button">Logout</button>
+                <script>
+                    $("#js-logout-button").on("click", function () {
+                        ajaxFunction("/logout", {}, "get");
+                    });
+                </script>
+            </c:when>
+        </c:choose>
         <div id="content"></div>
     </body>
     <script>

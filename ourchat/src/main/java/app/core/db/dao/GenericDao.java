@@ -36,6 +36,7 @@ import app.core.domain.Model;
  * multi-threading, performance improvements, {@code Logger} instead of
  * {@code System::out} and etc...
  */
+@SuppressWarnings("unchecked")
 public abstract class GenericDao<Dto extends Model> {
 
     private final Dto dto = newDto();
@@ -126,6 +127,19 @@ public abstract class GenericDao<Dto extends Model> {
             clazz = clazz.getSuperclass();
         }
         commaSeparatedColumns = columns.stream().collect(Collectors.joining(","));
+    }
+
+    public Dto getByWhereCondition(String whereCondition) {
+        try (Connection connection = getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT " + commaSeparatedColumns + " FROM " + tableName + " WHERE " + whereCondition);) {
+            if (resultSet.next()) {
+                return fromResultSet(resultSet);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        }
+        return null;
     }
 
     public Dto getById(long id) {

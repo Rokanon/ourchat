@@ -7,7 +7,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-<jsp:useBean id="profilePublicBean" class="ourchat.ourchat.user.publicBeans.ProfilePublicBean" scope="request"/>
+<jsp:useBean id="profilePublicBean" class="app.ourchat.user.publicBeans.ProfilePublicBean" scope="request"/>
 <jsp:setProperty name="profilePublicBean" property="userId" value="${param.userId}"/>
 
 <c:choose>

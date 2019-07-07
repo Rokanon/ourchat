@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.ourchat.user.servlet;
+package app.ourchat.profile.servlet;
 
 import app.core.servlet.AbstractServlet;
 import java.io.IOException;
@@ -11,14 +11,14 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import app.ourchat.user.logic.ProfileServletLogic;
+import app.ourchat.profile.logic.ProfileServletLogic;
 
 /**
  *
  * @author dark
  */
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/profile"})
-public class ProfileServlet extends AbstractServlet  {
+public class ProfileServlet extends AbstractServlet {
 
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -30,7 +30,7 @@ public class ProfileServlet extends AbstractServlet  {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        new ProfileServletLogic().select(request, response);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ProfileServlet extends AbstractServlet  {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {       
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         new ProfileServletLogic().insert(request, response);
     }
 
@@ -69,7 +69,7 @@ public class ProfileServlet extends AbstractServlet  {
      */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        new ProfileServletLogic().delete(request, response);
     }
 
 }

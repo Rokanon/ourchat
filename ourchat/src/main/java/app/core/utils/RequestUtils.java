@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author dark
  */
+@SuppressWarnings("unchecked")
 public class RequestUtils {
 
     private Map<String, String> parameterMap = new HashMap<>();
