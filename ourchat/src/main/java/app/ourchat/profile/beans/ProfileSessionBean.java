@@ -26,7 +26,6 @@ public class ProfileSessionBean implements Sessionable {
 
     public ProfileSessionBean() {
         
-
     }
 
     public static ProfileSessionBean getInstance() {
@@ -38,7 +37,7 @@ public class ProfileSessionBean implements Sessionable {
 
     @Override
     public boolean login(String mail, String password) {
-        if (!getLoggedIn()) {
+        if (!loggedIn) {
             User user = new UserDao().getByWhereCondition("mail = '" + mail + "'");
             if (null != user) {
                 if (validate(user.getPassword(), password)) {
@@ -51,7 +50,7 @@ public class ProfileSessionBean implements Sessionable {
         } else {
             loggedIn = Boolean.TRUE;
         }
-        return getLoggedIn();
+        return loggedIn;
 
     }
 
