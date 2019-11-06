@@ -12,7 +12,7 @@ ${profileSession.loggedIn}
             
         </textarea>
         <button id="js-send">Send</button>
-        <button id="js-receive">Receive</button>
+        <!--<button id="js-receive">Receive</button>-->
 
         <script>
             $("#js-send").on("click", function () {
@@ -23,11 +23,11 @@ ${profileSession.loggedIn}
                 params.message = message;
                 ajaxEdit("/send/message", params);
             });
-            $("#js-receive").on("click", function () {
-                let params = {};
-                
-                ajaxView("/receive/message", params);
-            });
+//            $("#js-receive").on("click", function () {
+//                let params = {};
+//                
+//                ajaxView("/receive/message", params);
+//            });
         </script>
 
     </c:when>
